@@ -1,29 +1,10 @@
-/*
- * img2ascii - turn any image into ASCII art
- *
- * Build:   gcc -O2 -o img2ascii img2ascii.c -lm
- * Needs:   stb_image.h in the same folder
- *          https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
- *
- * Usage:   ./img2ascii [options] image
- *   -w N   output width in characters (default 100)
- *   -i     invert brightness (use for dark text on light terminals)
- *   -c     colour output using ANSI 24-bit escape codes
- *   -n     don't auto-stretch contrast
- *   -s     use the short 10-character ramp instead of the long one
- *   -h     show help
- *
- * Example: ./img2ascii -w 120 -c photo.jpg > art.txt
- */
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define CHAR_ASPECT 0.5 /* terminal cells are roughly twice as tall as wide */
+#define CHAR_ASPECT 0.5
 
 static const char RAMP_LONG[] =
     " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
@@ -76,7 +57,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    /* Load as RGB regardless of the file's native format. */
     int w, h, n;
     unsigned char *img = stbi_load(path, &w, &h, &n, 3);
     if (!img) {
@@ -98,7 +78,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    /* Box-filter: average every source pixel that falls inside each cell. */
     double lo = 255.0, hi = 0.0;
     for (int cy = 0; cy < out_h; cy++) {
         int y0 = (int)((long long)cy * h / out_h);
@@ -125,7 +104,7 @@ int main(int argc, char **argv)
             }
             sr /= count; sg /= count; sb /= count;
 
-            /* Rec. 709 luma */
+            
             double l = 0.2126 * sr + 0.7152 * sg + 0.0722 * sb;
             size_t idx = (size_t)cy * out_w + cx;
             lum[idx] = l;
@@ -143,7 +122,7 @@ int main(int argc, char **argv)
     for (int cy = 0; cy < out_h; cy++) {
         for (int cx = 0; cx < out_w; cx++) {
             size_t idx = (size_t)cy * out_w + cx;
-            double t = (lum[idx] - lo) / range;       /* 0..1 */
+            double t = (lum[idx] - lo) / range;      
             if (t < 0) t = 0;
             if (t > 1) t = 1;
             if (invert) t = 1.0 - t;
