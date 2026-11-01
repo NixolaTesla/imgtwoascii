@@ -17,7 +17,7 @@ curl -O https://raw.githubusercontent.com/nothings/stb/master/stb_image.h
 Invoke-WebRequest -Uri https://raw.githubusercontent.com/nothings/stb/master/stb_image.h -OutFile stb_image.h
 ```
 
-As  compile:
+**As for compiling:**
 ```
 gcc -O2 -o img2ascii img2ascii.c -lm
 ```
